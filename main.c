@@ -1,5 +1,6 @@
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_stdinc.h"
+#include "SDL3/SDL_video.h"
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -46,7 +47,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     *appstate = state; // Make available when we pass this into loops later.
 
     /* Create the window */
-    if (!SDL_CreateWindowAndRenderer("Hello World", 800, 600, 0, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("MiniWorlds", 800, 600, SDL_WINDOW_FULLSCREEN, &window, &renderer)) {
         SDL_Log("Couldn't create window and renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
