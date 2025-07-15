@@ -1,0 +1,61 @@
+# --- Build Directories ---
+# Never commit build folders (CMake, Make, etc.)
+build/
+*/build/
+*.xcodeproj/
+*.vcxproj*
+*.sln
+*.cbp
+Makefile
+
+vendored/SDL/build/
+vendored/SDL/CMakeCache.txt
+vendored/SDL/CMakeFiles/
+
+# --- Binaries and Executables ---
+*.exe
+*.out
+*.app
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+
+# --- IDE/Editor Files ---
+# Clangd (LSP) config and cache
+.clangd
+.cache/
+.clang-tidy
+.clang-format
+
+# VS Code
+.vscode/
+!.vscode/settings.json  # Optional: Keep if you want to share settings
+!.vscode/extensions.json
+
+# Other IDEs
+.idea/
+*.swp
+*.swo
+*~
+
+# --- CMake Generated Files ---
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+
+# --- SDL Specific ---
+# Uncomment if your project generates these
+*.res
+*.aps
+vendored/SDL/*.pc
+vendored/SDL/*.la
+vendored/SDL/*.dll
+vendored/SDL/*.so
+
+# --- System/Misc ---
+.DS_Store
+Thumbs.db
