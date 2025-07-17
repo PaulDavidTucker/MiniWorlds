@@ -1,13 +1,27 @@
+#include "SDL3/SDL_init.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_stdinc.h"
 #include "SDL3/SDL_video.h"
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+
 #include <stdio.h>
+#include <getopt.h>
+#include <stdlib.h>
+#include <errno.h>
+
+#define DEFAULT_FPS_CAP 60.0f
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
+
+// Define long options
+// {name, has_arg, flag, val}
+static struct option long_options[] = {
+    {"fps", required_argument, 0, 'f'},
+    {0, 0, 0, 0}                         // Sentinel to mark the end
+};
 
 typedef struct AppState {
     Uint64 lastCount;
@@ -18,18 +32,7 @@ typedef struct AppState {
     float userGivenCap;
 } AppState;
 
-SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
-{
-    float cap = 60.0f;
-    if (argc > 1) {
-        cap = SDL_atof(argv[1]);
-
-        if (!cap){
-            SDL_Log("Was not able to parse given FPS value.");
-            return SDL_APP_FAILURE;
-        }
-    }
-
+SDL_AppResult CreateMainWindowAndRender(void **appstate, float cap){
     // Create a state object which we can access. Allocates stack space the size of the app state enum!
     AppState *state = SDL_calloc(1, sizeof(AppState));
 
@@ -52,6 +55,61 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_APP_FAILURE;
     }
     return SDL_APP_CONTINUE;
+}
+
+SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
+{
+    float cap = DEFAULT_FPS_CAP;
+
+    int opt;
+
+    while ((opt = getopt_long(argc, argv, "f:", long_options, NULL)) != -1) {
+        switch (opt) {
+            case 'f': {
+                // optarg contains the argument for the option
+                char *endptr;
+                errno = 0;
+
+                float parsed_cap = strtof(optarg, &endptr);
+                if (*endptr != '\0') {
+                    fprintf(stderr, "Error: Invalid value for --fps/-f: %s\nFalling back to default %.2f FPS\n", optarg, DEFAULT_FPS_CAP);
+                    cap = DEFAULT_FPS_CAP;
+                    break;
+                }
+
+                if (errno == ERANGE) {
+                    fprintf(stderr, "Error: --fps/-f value %s is out of float range.\nFalling back to default %.2f FPS\n", optarg, DEFAULT_FPS_CAP);
+                    return SDL_APP_FAILURE;
+                }
+
+                if (parsed_cap <= 0.0f || parsed_cap > 1000.0f) {
+                    fprintf(stderr, "Warning: --fps/-f value %.2f is outside typical range (0-1000). Using default %f FPS.\n", parsed_cap, DEFAULT_FPS_CAP);
+                    cap = DEFAULT_FPS_CAP;
+                } else {
+                    cap = parsed_cap;
+                }
+                cap = parsed_cap; // Assign the parsed value to 'cap'
+                break;
+            }
+            case '?': {
+                // getopt_long prints an error message for unknown options
+                SDL_Log("Unknown option %d", opt);
+                return SDL_APP_FAILURE;
+            }
+            default: {
+                // Should not happen for standard getopt_long usage
+                return SDL_APP_FAILURE;
+            }
+        }
+    }
+
+    SDL_Log("FPS set to: %.2f", cap);
+
+    for (int i = optind; i < argc; i++) {
+        printf("Non-option argument: %s\n", argv[i]);
+    }
+
+    return CreateMainWindowAndRender(appstate, cap);;
 }
 
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
