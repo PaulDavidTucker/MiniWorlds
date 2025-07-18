@@ -1,13 +1,14 @@
 #include "game.h"
+#include "SDL3/SDL_error.h"
 #include "player.h"
 #include "world.h"
-#include <SDL3/SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 #include <stdlib.h>  // For rand()
 
 static SDL_Texture* LoadTexture(SDL_Renderer* renderer, const char* filePath) {
     SDL_Surface* surface = IMG_Load(filePath);
     if (!surface) {
-        SDL_Log("Failed to load image: %s", IMG_GetError());
+        SDL_Log("Failed to load image: %s", SDL_GetError());
         return NULL;
     }
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);

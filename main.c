@@ -53,7 +53,7 @@ SDL_AppResult CreateMainWindowAndRender(void **appstate, float cap){
     *appstate = state; // Make available when we pass this into loops later.
 
     /* Create the window */
-    if (!SDL_CreateWindowAndRenderer("MiniWorlds", 800, 600, SDL_WINDOW_FULLSCREEN, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("MiniWorlds", 800, 600, 0, &window, &renderer)) {
         SDL_Log("Couldn't create window and renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
@@ -178,13 +178,14 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     x = ((w / scale) - SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE * SDL_strlen(message)) / 2;
     y = ((h / scale) - SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE) / 2;
 
-    /* Draw the message */
+    /* Draw the message
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderDebugText(renderer, x, y, message);
     SDL_RenderDebugText(renderer, x, y-35, fpsText);
     SDL_RenderPresent(renderer);
+    */
 
     Game_Update(&state->gameState);
     Game_Render(&state->gameState, renderer);
@@ -197,6 +198,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
     AppState *state = (AppState *)appstate;
+    Game_Shutdown(&state->gameState);
     SDL_free(state);
     // Freed memory
 }
