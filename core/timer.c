@@ -1,17 +1,14 @@
 #include "timer.h"
 #include "SDL3/SDL_timer.h"
 
-Uint64 lastFrameTime = 0;
-double targetFrameTime = 1000.0 / 60.0; // 60Hz
-
-double getDeltaTime() {
-    Uint64 current = SDL_GetTicks();
-    double dt = (double)(current - lastFrameTime);
-    lastFrameTime = current;
-    return dt;
+void Timer_Init(Timer *timer){
+    timer -> frequency = SDL_GetPerformanceFrequency();
+    timer -> previous = SDL_GetPerformanceCounter();
+    timer -> deltaTime = 0.0f;
 }
 
-void delayToCapFPS(double elapsed) {
-    double wait = targetFrameTime - elapsed;
-    if (wait > 0) SDL_Delay((Uint32)wait);
+void Timer_Update(Timer *timer){
+    Uint64 current = SDL_GetPerformanceCounter();
+    timer -> deltaTime = (float)(( current - timer -> previous) / (double)timer->frequency);
+    timer -> previous = current;
 }

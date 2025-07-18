@@ -22,5 +22,9 @@ Run the generated binary:
 
 The given executable runs at a 60fps cap by default, can be bumped up to a given value by passing in as a param. e.g.
 ```bash
-./MiniWorlds 120
+./MiniWorlds --fps 120
 ```
+
+## Options
+
+--fps / -f : Set framecap for running game session. Default of 60.

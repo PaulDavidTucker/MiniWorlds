@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include "game/game.h"
+
 #define DEFAULT_FPS_CAP 60.0f
 
 static SDL_Window *window = NULL;
@@ -30,6 +32,7 @@ typedef struct AppState {
     int framecount;
     float fps;
     float userGivenCap;
+    GameState gameState;
 } AppState;
 
 SDL_AppResult CreateMainWindowAndRender(void **appstate, float cap){
@@ -108,8 +111,13 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     for (int i = optind; i < argc; i++) {
         printf("Non-option argument: %s\n", argv[i]);
     }
+    AppState *state = SDL_calloc(1, sizeof(AppState));
 
-    return CreateMainWindowAndRender(appstate, cap);;
+    SDL_AppResult init_Result =  CreateMainWindowAndRender(appstate, cap);
+
+    Game_Init(&state->gameState, renderer);
+
+    return init_Result;
 }
 
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
@@ -177,6 +185,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     SDL_RenderDebugText(renderer, x, y, message);
     SDL_RenderDebugText(renderer, x, y-35, fpsText);
     SDL_RenderPresent(renderer);
+
+    Game_Update(&state->gameState);
+    Game_Render(&state->gameState, renderer);
 
 
     return SDL_APP_CONTINUE;
