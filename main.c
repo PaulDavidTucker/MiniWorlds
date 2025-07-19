@@ -1,4 +1,6 @@
+#include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
+#include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_stdinc.h"
 #include "SDL3/SDL_video.h"
@@ -113,7 +115,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
     AppState *state = SDL_calloc(1, sizeof(AppState));
 
-    SDL_AppResult init_Result =  CreateMainWindowAndRender(appstate, cap);
+    SDL_AppResult init_Result = CreateMainWindowAndRender(appstate, cap);
 
     Game_Init(&state->gameState, renderer);
 
@@ -123,10 +125,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
-    if (event->type == SDL_EVENT_KEY_DOWN ||
-        event->type == SDL_EVENT_QUIT) {
+    if (event->type == SDL_EVENT_QUIT) {
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     }
+
+    if (event-> type ==SDL_EVENT_KEY_DOWN){
+        //if (event -> key == SDLK_Q)
+    }
+
     return SDL_APP_CONTINUE;
 }
 
@@ -156,40 +162,17 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     state->framecount++;
 
     double timeSinceLastFpsUpdate = (double)(current - state->lastCount) / state->freq;
+
     if (timeSinceLastFpsUpdate >= 1.0) {
         state->fps = (float)(state->framecount / timeSinceLastFpsUpdate);
-        SDL_Log("FPS: %.2f", state->fps);
         state->framecount = 0;
         state->lastCount = current;
     }
 
-    const char *message = "Hello World!";
+    float dt = (float)elapsed;
 
-    char fpsText[64];
-    SDL_snprintf(fpsText, sizeof(fpsText), "FPS: %.2f", state->fps);
-
-    int w = 0, h = 0;
-    float x, y;
-    const float scale = 4.0f;
-
-    /* Center the message and scale it up */
-    SDL_GetRenderOutputSize(renderer, &w, &h);
-    SDL_SetRenderScale(renderer, scale, scale);
-    x = ((w / scale) - SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE * SDL_strlen(message)) / 2;
-    y = ((h / scale) - SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE) / 2;
-
-    /* Draw the message
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderDebugText(renderer, x, y, message);
-    SDL_RenderDebugText(renderer, x, y-35, fpsText);
-    SDL_RenderPresent(renderer);
-    */
-
-    Game_Update(&state->gameState);
-    Game_Render(&state->gameState, renderer);
-
+    Game_Update(&state->gameState, dt);
+    Game_Render(&state->gameState, renderer, state ->fps, state-> gameState.score);
 
     return SDL_APP_CONTINUE;
 }

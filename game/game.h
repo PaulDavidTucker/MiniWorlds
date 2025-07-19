@@ -33,6 +33,7 @@ typedef struct {
     Timer timer;
     Entity entities[MAX_ENTITIES];
     int entityCount;
+    int score;
 
     // Particle array def
     struct Particle {
@@ -49,8 +50,8 @@ typedef struct {
 } GameState;
 
 void Game_Init(GameState* state, SDL_Renderer* renderer);
-void Game_Update(GameState* state);
-void Game_Render(GameState* state, SDL_Renderer* renderer);
+void Game_Update(GameState* state, float dt);
+void Game_Render(GameState* state, SDL_Renderer* renderer, float fps, int score);
 void Game_Shutdown(GameState* state);
 
 void EmitParticles(GameState* state, int count, SDL_FPoint origin, SDL_Color color);
