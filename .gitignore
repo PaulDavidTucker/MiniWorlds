@@ -8,6 +8,8 @@ build/
 *.cbp
 Makefile
 
+log.txt
+
 vendored/SDL/build/
 vendored/SDL/CMakeCache.txt
 vendored/SDL/CMakeFiles/

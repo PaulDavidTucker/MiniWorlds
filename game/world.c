@@ -1,4 +1,5 @@
 #include "world.h"
+#include "SDL3/SDL_log.h"
 #include <SDL3_image/SDL_image.h>
 
 // Simple tile grid (0 = empty, 1 = grass, etc.)
@@ -19,6 +20,10 @@ static SDL_Texture* tileTexture = NULL;  // Placeholder
 
 void World_Init(SDL_Renderer* renderer) {
     tileTexture = IMG_LoadTexture(renderer, "assets/grass.png");  // Load actual texture
+
+    if (!tileTexture){
+        SDL_Log("DEBUG: Successfully loaded surface for world - %s", "assets/grass.png");
+    }
 }
 
 void World_Render(SDL_Renderer* renderer, SDL_FPoint* camera) {

@@ -1,12 +1,12 @@
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
-#include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_stdinc.h"
 #include "SDL3/SDL_video.h"
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3_image/SDL_image.h>
 
 #include <stdio.h>
 #include <getopt.h>
@@ -66,6 +66,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
     float cap = DEFAULT_FPS_CAP;
 
+    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
+
     int opt;
 
     while ((opt = getopt_long(argc, argv, "f:", long_options, NULL)) != -1) {
@@ -113,11 +115,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     for (int i = optind; i < argc; i++) {
         printf("Non-option argument: %s\n", argv[i]);
     }
-    AppState *state = SDL_calloc(1, sizeof(AppState));
 
     SDL_AppResult init_Result = CreateMainWindowAndRender(appstate, cap);
 
-    Game_Init(&state->gameState, renderer);
+    // Now initialize game on the REAL appstate (set by CreateMainWindowAndRender)
+    AppState *realState = (AppState *)*appstate;  // Cast the void* to access
+    Game_Init(&realState->gameState, renderer);
 
     return init_Result;
 }
@@ -130,7 +133,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
     }
 
     if (event-> type ==SDL_EVENT_KEY_DOWN){
-        //if (event -> key == SDLK_Q)
+        //if ( key pressed is == SDLK_Q)
     }
 
     return SDL_APP_CONTINUE;
